@@ -1,0 +1,16 @@
+{
+  "name": "twitter-server",
+  "version": "1.0.0",
+  "description": "backend server for twitter app",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "tsc-watch": "^6.2.0",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "start": "node build/index",
+    "build": "tsc -p .",
+    "dev" : "tsc-watch --onSuccess \"npm start\""
+  }
+}
