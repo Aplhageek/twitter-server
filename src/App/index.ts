@@ -3,11 +3,14 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import bodyParser from 'body-parser';
 import { User } from './User';
-
-
+import cors from 'cors';
 
 export async function initServer() {
     const app = express();
+
+    // enable cors
+    app.use(cors());
+    app.options("*", cors());
 
     //  ! means its required;
     const graphqlServer = new ApolloServer({

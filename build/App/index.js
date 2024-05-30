@@ -18,9 +18,13 @@ const server_1 = require("@apollo/server");
 const express4_1 = require("@apollo/server/express4");
 const body_parser_1 = __importDefault(require("body-parser"));
 const User_1 = require("./User");
+const cors_1 = __importDefault(require("cors"));
 function initServer() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = express();
+        // enable cors
+        app.use((0, cors_1.default)());
+        app.options("*", (0, cors_1.default)());
         //  ! means its required;
         const graphqlServer = new server_1.ApolloServer({
             typeDefs: `
