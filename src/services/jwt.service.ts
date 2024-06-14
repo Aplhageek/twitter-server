@@ -2,6 +2,8 @@ import JWT from 'jsonwebtoken';
 import { prismaClient } from '../client/db';
 import { User } from '@prisma/client';
 
+// TODO: MAgic secreteKey
+
 export class JWTService {
     private static secreteKey = "$uper#duper";
 

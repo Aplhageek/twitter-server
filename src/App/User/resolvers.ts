@@ -30,6 +30,7 @@ interface GoogleTokenResult {
 const queries = {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
         const googleToken = token;
+        // TODO : MAGIC STRING and param 
         const googleOAuthURL = new URL("https://oauth2.googleapis.com/tokeninfo");
         googleOAuthURL.searchParams.set("id_token", googleToken);
 
@@ -38,6 +39,7 @@ const queries = {
         // check if user present in our DB
         const user = await prismaClient.user.findUnique({ where: { email: data.email } });
 
+        // if no user, create one
         if (!user) {
             await prismaClient.user.create({
                 data: {
@@ -54,7 +56,7 @@ const queries = {
         if (!userInDB) throw new Error("User not found");
 
         // generate token using jsonwebtoken
-        const userToken = await JWTService.generateTokenForUser(userInDB);
+        const userToken = JWTService.generateTokenForUser(userInDB);
 
         return userToken;
     },
