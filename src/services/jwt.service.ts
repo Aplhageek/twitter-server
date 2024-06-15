@@ -1,6 +1,7 @@
 import JWT from 'jsonwebtoken';
-import { prismaClient } from '../client/db';
+
 import { User } from '@prisma/client';
+import { JWTUser } from '../interfaces';
 
 // TODO: MAgic secreteKey
 
@@ -9,12 +10,16 @@ export class JWTService {
 
     public static  generateTokenForUser(user: User): string{
         
-        const payload = {
+        const payload : JWTUser = {
             id: user?.id,
             email: user?.email,
         }
 
         const token = JWT.sign(payload, this.secreteKey);
         return token;
+    }
+
+    public static decodeTokenForUser = (token : any) => {
+        return JWT.verify(token, this.secreteKey) as JWTUser;
     }
 }
