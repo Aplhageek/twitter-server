@@ -21,6 +21,23 @@ model User {
   email String @unique
   profileImageURL String?
 
+  tweets Tweet[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }  
+
+// Fields sets the foreng key and ref defines its ref to field of Model mentioned before (in out case is User)
+// user doesnt create a col but defines a rel
+// in order to have this rel we should also mention it in User model
+model Tweet {
+  id String @id @default(cuid())
+  content String
+  imageURL String? //optional
+
+  userId String
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
