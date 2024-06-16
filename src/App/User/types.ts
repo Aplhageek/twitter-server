@@ -1,4 +1,12 @@
 export const types = `#graphql
+    type Tweet {
+        id: ID!
+        content: String!
+        imageURL: String
+
+        user: User
+    }
+    
     type User {
         id: ID!
         firstName: String!
@@ -6,6 +14,6 @@ export const types = `#graphql
         email: String!
         profileImageURL: String
 
-        user: [Tweet]
+        tweets: [Tweet] 
     }
 `;
