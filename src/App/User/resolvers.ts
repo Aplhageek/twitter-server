@@ -47,12 +47,15 @@ const queries = {
                     email: data.email,
                     firstName: data.given_name,
                     lastName: data.family_name,
-                    profileImage: data.picture,
+                    profileImageURL: data.picture,
                 }
             });
         }
 
         const userInDB = await prismaClient.user.findUnique({ where: { email: data.email } });
+
+        console.log("userInDB ==>>>>>>>>>", userInDB)
+        console.log("GoogleToken ==>>>>>>>>>", googleToken)
 
         if (!userInDB) throw new Error("User not found");
 

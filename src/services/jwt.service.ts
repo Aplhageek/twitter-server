@@ -19,6 +19,7 @@ export class JWTService {
         return token;
     }
 
+    // TODO: refactor to use better token with exp and types.
     public static decodeTokenForUser = (token : any) => {
         return JWT.verify(token, this.secreteKey) as JWTUser;
     }
