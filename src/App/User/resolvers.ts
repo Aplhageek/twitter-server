@@ -2,6 +2,7 @@ import axios from "axios"
 import { prismaClient } from "../../client/db";
 import { JWTService } from "../../services/jwt.service";
 import { GraphqlContext } from "../../interfaces";
+import { User } from "@prisma/client";
 
 /**
  * {token}:{token : String}
@@ -89,4 +90,15 @@ const queries = {
     }
 }
 
-export const resolvers = { queries };
+/**
+ *  This syntax suggests that Tweet model might have a nested user object (or relation) that contains an id field. Prisma uses this syntax when dealing with relational data and nested queries.
+ *  tweets: (parent: User) => prismaClient.tweet.findMany({where: {user : {id: parent.id}}}), 
+
+ */
+const nestedRelationResolver = {
+    User : {
+        tweets: (parent: User) => prismaClient.tweet.findMany({where: {userId : parent.id}}), 
+    }
+}
+
+export const resolvers = { queries,nestedRelationResolver };
