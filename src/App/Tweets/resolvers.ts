@@ -49,9 +49,13 @@ const nestedRelationResolver = {
 };
 
 
+const queries = {
+  getAllTweets : () => prismaClient.tweet.findMany({orderBy: {createdAt: "desc"}}),
+}
 
 
   export const resolvers = {
     mutations,
-    nestedRelationResolver
+    nestedRelationResolver,
+    queries,
   }
