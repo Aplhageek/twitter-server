@@ -3,7 +3,6 @@ export const types = `#graphql
         id: ID!
         content: String!
         imageURL: String
-
         user: User
     }
     
@@ -13,7 +12,6 @@ export const types = `#graphql
         lastName: String
         email: String!
         profileImageURL: String
-
         tweets: [Tweet] 
     }
 `;

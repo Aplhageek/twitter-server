@@ -87,7 +87,9 @@ const queries = {
 
         // Return the user object if found. If no user is found, this will return null.
         return user;
-    }
+    },
+
+    getUserById: async (parent: any, {id} : {id: string}, ctx : GraphqlContext) => prismaClient.user.findUnique({where: {id}}),
 }
 
 /**
