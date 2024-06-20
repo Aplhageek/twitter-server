@@ -6,6 +6,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/cors": "^2.8.17",
+    "@types/dotenv": "^8.2.0",
     "@types/jsonwebtoken": "^9.0.6",
     "prisma": "^5.14.0",
     "tsc-watch": "^6.2.0",
@@ -24,7 +25,9 @@
     "axios": "^1.7.2",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "graphql": "^16.8.1",
+    "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2"
   }
 }
