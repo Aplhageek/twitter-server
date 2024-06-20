@@ -1,8 +1,5 @@
 // config.ts
-
 const  dotenv = require("dotenv");
-
-
 import Joi from "joi";
 import path from "path";
 
@@ -26,8 +23,8 @@ if (error) {
     throw new Error(`Config validation error: ${error.message}`);
 }
 
-const config = {
-    env: envVars.NODE_ENV,
+export const env = {
+    NODE_ENV: envVars.NODE_ENV,
     port: envVars.PORT,
     database: {
         url: envVars.DATABASE_URL,
@@ -39,5 +36,3 @@ const config = {
         }
     }
 };
-
-export default config;
