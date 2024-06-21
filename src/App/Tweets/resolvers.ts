@@ -87,7 +87,7 @@ const whatsMySignURL = async (bucketName: string, bucketKey: string) => {
 const queries = {
   getAllTweets: () => prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }),
 
-  getSignedURLForTweetImage:
+  getSignedURLForTweet:
     async (parent: any, { imageName, imageType }: { imageType: string, imageName: string }, ctx: GraphqlContext) => {
       // is user authenticated
       if (!ctx.user || !ctx.user.id) throw new Error("you are not Authenticated");
@@ -95,7 +95,7 @@ const queries = {
       if (!config.allowed.imageTypes.includes(imageType)) throw new Error("This Image type is not Supported");
 
       const bucketName = "mytwitter-dev-bucket"
-      const bucketKey = `uploads/${ctx.user.id}/tweets/${imageName}-${Date.now()}.${imageType}`
+      const bucketKey = `uploads/${ctx.user.id}/tweets/${imageName}-${Date.now()}`
 
 
       const signedUrl = await whatsMySignURL(bucketName, bucketKey);
