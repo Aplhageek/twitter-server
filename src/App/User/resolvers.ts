@@ -99,7 +99,7 @@ const queries = {
  */
 const nestedRelationResolver = {
     User : {
-        tweets: (parent: User) => prismaClient.tweet.findMany({where: {userId : parent.id}}), 
+        tweets: (parent: User) => prismaClient.tweet.findMany({where: {userId : parent.id} , orderBy: { createdAt: "desc" }}), 
     }
 }
 
