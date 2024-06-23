@@ -3,67 +3,14 @@ import { prismaClient } from "../../client/db";
 import { JWTService } from "../../services/jwt.service";
 import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
+import AuthService from "../../services/auth.service";
 
-/**
- * {token}:{token : String}
- * this is just defining a type of token parameter
- */
 
-interface GoogleTokenResult {
-    iss?: string;
-    nbf?: string;
-    aud?: string;
-    sub?: string;
-    email: string;
-    email_verified: string;
-    azp?: string;
-    name?: string;
-    picture?: string;
-    given_name: string;
-    family_name?: string;
-    iat?: string;
-    exp?: string;
-    jti?: string;
-    alg?: string;
-    kid?: string;
-    typ?: string;
-}
 
 const queries = {
     verifyGoogleToken: async (parent: any, { token }: { token: string }) => {
-        const googleToken = token;
-        // TODO : MAGIC STRING and param 
-        const googleOAuthURL = new URL("https://oauth2.googleapis.com/tokeninfo");
-        googleOAuthURL.searchParams.set("id_token", googleToken);
-
-        const { data } = await axios.get<GoogleTokenResult>(googleOAuthURL.toString(), { responseType: "json", });
-
-        // check if user present in our DB
-        const user = await prismaClient.user.findUnique({ where: { email: data.email } });
-
-        // if no user, create one
-        if (!user) {
-            await prismaClient.user.create({
-                data: {
-                    email: data.email,
-                    firstName: data.given_name,
-                    lastName: data.family_name,
-                    profileImageURL: data.picture,
-                }
-            });
-        }
-
-        const userInDB = await prismaClient.user.findUnique({ where: { email: data.email } });
-
-        console.log("userInDB ==>>>>>>>>>", userInDB)
-        console.log("GoogleToken ==>>>>>>>>>", googleToken)
-
-        if (!userInDB) throw new Error("User not found");
-
-        // generate token using jsonwebtoken
-        const userToken = JWTService.generateTokenForUser(userInDB);
-
-        return userToken;
+        const customGeneratedToken = await AuthService.verifyTokenAndUser(token);
+        return customGeneratedToken;
     },
 
     /**

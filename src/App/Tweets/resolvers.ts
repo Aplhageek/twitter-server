@@ -80,9 +80,6 @@ const whatsMySignURL = async (bucketName: string, bucketKey: string) => {
   }
 };
 
-// console.log(config.env.AWS.S3.access_key);
-
-
 
 const queries = {
   getAllTweets: () => prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }),
@@ -94,8 +91,8 @@ const queries = {
 
       if (!config.allowed.imageTypes.includes(imageType)) throw new Error("This Image type is not Supported");
 
-      const bucketName = "mytwitter-dev-bucket"
-      const bucketKey = `uploads/${ctx.user.id}/tweets/${imageName}-${Date.now()}`
+      const bucketName = config.env.AWS.S3.tweet_bucket;
+      const bucketKey = `uploads/${ctx.user.id}/tweets/${imageName}-${Date.now()}`;
 
 
       const signedUrl = await whatsMySignURL(bucketName, bucketKey);

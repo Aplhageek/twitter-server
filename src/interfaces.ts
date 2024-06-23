@@ -6,3 +6,11 @@ export interface JWTUser {
 export interface GraphqlContext {
     user?: JWTUser;
 }
+
+export interface CreateUser {
+    email: string,
+    firstName: string,
+    lastName?: string ,
+    profileImageURL?: string,
+
+}

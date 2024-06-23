@@ -4,5 +4,6 @@ import { env } from "./env";
 
 export const config = {
     allowed,
-    env
+    env,
+    googleOAuthURL: "https://oauth2.googleapis.com/tokeninfo"
 }
