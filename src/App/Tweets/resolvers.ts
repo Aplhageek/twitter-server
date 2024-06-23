@@ -4,6 +4,7 @@ import { GraphqlContext } from "../../interfaces";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { config } from "../../config"
+import UserService from "../../services/user.service";
 
 interface CreateTweetPayload {
   content: string;
@@ -42,11 +43,9 @@ const mutations = {
 const nestedRelationResolver = {
   Tweet: {
     // Resolve the 'user' field for the Tweet type
-    user: (parent: Tweet) => {
+    user: async  (parent: Tweet) => {
       // Use PrismaClient to find a unique user based on the parent Tweet's userId
-      return prismaClient.user.findUnique({
-        where: { id: parent.userId }  // Query by userId from the parent Tweet
-      });
+      return await UserService.findById(parent.userId)  // Query by userId from the parent Tweet
     },
   },
 };

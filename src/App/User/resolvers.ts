@@ -4,6 +4,7 @@ import { JWTService } from "../../services/jwt.service";
 import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import AuthService from "../../services/auth.service";
+import UserService from "../../services/user.service";
 
 
 
@@ -25,18 +26,15 @@ const queries = {
         // Extract the user ID from the context object. This assumes the context includes a user object with an id field.
         // The ctx (context) object is typically created and passed to resolvers by the GraphQL server setup. 
         const id = ctx.user?.id;
-
         // If the user ID is not present, return null indicating that the user is not authenticated.
         if (!id) return null;
-
         // Query the database to find a user with the given ID.
-        const user = await prismaClient.user.findUnique({ where: { id } });
-
+        const user = await UserService.findById(id);
         // Return the user object if found. If no user is found, this will return null.
         return user;
     },
 
-    getUserById: async (parent: any, {id} : {id: string}, ctx : GraphqlContext) => prismaClient.user.findUnique({where: {id}}),
+    getUserById: async (parent: any, {id} : {id: string}, ctx : GraphqlContext) => await UserService.findById(id),
 }
 
 /**
