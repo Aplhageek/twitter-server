@@ -1,13 +1,9 @@
 import { Tweet } from "@prisma/client";
-import { prismaClient } from "../../client/db";
 import { GraphqlContext } from "../../interfaces";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { config } from "../../config"
 import UserService from "../../services/user.service";
 import { TweetService } from "../../services/tweet.service";
-import { s3Client } from "../../aws/s3";
-import { whatsMySignURL } from "../../services/aws.service";
+import { AwsService } from "../../services/aws.service";
 
 interface CreateTweetPayload {
   content: string;
@@ -24,8 +20,7 @@ const mutations = {
   },
 };
 
-// defining extra resolvers for users 
-// Define extra resolvers for the Tweet type
+// Define extra resolvers for the Tweet type when asked for user inside it
 const nestedRelationResolver = {
   Tweet: {
     // Resolve the 'user' field for the Tweet type
@@ -37,7 +32,7 @@ const nestedRelationResolver = {
 };
 
 const queries = {
-  getAllTweets: () => prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }),
+  getAllTweets: async () => await TweetService.getAll("desc"),
 
   getSignedURLForTweet:
     async (parent: any, { imageName, imageType }: { imageType: string, imageName: string }, ctx: GraphqlContext) => {
@@ -49,7 +44,7 @@ const queries = {
       const bucketName = config.env.AWS.S3.tweet_bucket;
       const bucketKey = `uploads/${ctx.user.id}/tweets/${imageName}-${Date.now()}`;
 
-      const signedUrl = await whatsMySignURL(bucketName, bucketKey);
+      const signedUrl = await AwsService.whatsMySignURL(bucketName, bucketKey);
       return signedUrl;
     }
 }

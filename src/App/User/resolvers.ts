@@ -1,6 +1,4 @@
-import axios from "axios"
 import { prismaClient } from "../../client/db";
-import { JWTService } from "../../services/jwt.service";
 import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import AuthService from "../../services/auth.service";
@@ -34,18 +32,18 @@ const queries = {
         return user;
     },
 
-    getUserById: async (parent: any, {id} : {id: string}, ctx : GraphqlContext) => await UserService.findById(id),
+    getUserById: async (parent: any, { id }: { id: string }, ctx: GraphqlContext) => await UserService.findById(id),
 }
 
 /**
- *  This syntax suggests that Tweet model might have a nested user object (or relation) that contains an id field. Prisma uses this syntax when dealing with relational data and nested queries.
+ *  This syntax suggests that Tweet model might have a nested user object (or relation) that contains an id field. 
+ *  Prisma uses this syntax when dealing with relational data and nested queries.
  *  tweets: (parent: User) => prismaClient.tweet.findMany({where: {user : {id: parent.id}}}), 
-
  */
 const nestedRelationResolver = {
-    User : {
+    User: {
         tweets: (parent: User) => prismaClient.tweet.findMany({where: {userId : parent.id} , orderBy: { createdAt: "desc" }}), 
     }
 }
 
-export const resolvers = { queries,nestedRelationResolver };
+export const resolvers = { queries, nestedRelationResolver };
