@@ -5,6 +5,7 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { config } from "../../config"
 import UserService from "../../services/user.service";
+import { TweetService } from "../../services/tweet.service";
 
 interface CreateTweetPayload {
   content: string;
@@ -15,28 +16,11 @@ interface CreateTweetPayload {
 const mutations = {
   // Resolver function for createTweet mutation 
   createTweet: async (parent: any, { payload }: { payload: CreateTweetPayload }, ctx: GraphqlContext) => {
-    // Check if the user is authenticated
     if (!ctx.user) throw new Error("You are not authenticated");
-
-    // Create a new tweet using Prisma client
-    const tweet = await prismaClient.tweet.create({
-      data: {
-        content: payload.content,
-        imageURL: payload.imageURL,
-        // Establish a relationship with the user who created the tweet
-        user: {
-          connect: { id: ctx.user.id } // Connect the user's ID from context with the tweet
-        }
-        // Alternatively, you can use 'userId' to directly set the user ID
-        // userId: ctx.user.id,
-      }
-    });
-
-    // Return the newly created tweet
+    const tweet = await TweetService.create(ctx.user.id , payload);
     return tweet;
   },
 };
-
 
 // defining extra resolvers for users 
 // Define extra resolvers for the Tweet type

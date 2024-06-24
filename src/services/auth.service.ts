@@ -9,6 +9,7 @@ import { config } from "../config";
 import { JWTService } from "./jwt.service";
 import UserService from "./user.service";
 import { User } from "@prisma/client";
+import { GraphqlContext } from "../interfaces";
 
 interface GoogleTokenResult {
     iss?: string;
@@ -31,6 +32,7 @@ interface GoogleTokenResult {
 }
 
 class AuthService {
+
     public static async verifyTokenAndUser(token: string) : Promise<string> {
         try {
             const googleTokenData = await this.verifyGoogleToken(token);
@@ -42,7 +44,6 @@ class AuthService {
             throw new Error("Failed to verify token and user");
         }
     }
-
 
     private static async verifyGoogleToken(token: string): Promise<GoogleTokenResult> {
         const googleOAuthURL = new URL(config.googleOAuthURL);
