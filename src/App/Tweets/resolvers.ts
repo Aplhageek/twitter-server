@@ -1,11 +1,13 @@
 import { Tweet } from "@prisma/client";
 import { prismaClient } from "../../client/db";
 import { GraphqlContext } from "../../interfaces";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { config } from "../../config"
 import UserService from "../../services/user.service";
 import { TweetService } from "../../services/tweet.service";
+import { s3Client } from "../../aws/s3";
+import { whatsMySignURL } from "../../services/aws.service";
 
 interface CreateTweetPayload {
   content: string;
@@ -34,36 +36,6 @@ const nestedRelationResolver = {
   },
 };
 
-
-const s3Client = new S3Client({
-  region: "ap-south-1",
-  credentials: {
-    secretAccessKey: config.env.AWS.S3.secret_key,
-    accessKeyId: config.env.AWS.S3.access_key,
-  },
-});
-
-const whatsMySignURL = async (bucketName: string, bucketKey: string) => {
-
-  const putObjectCommand = new PutObjectCommand({
-    Bucket: bucketName,
-    Key: bucketKey,
-  });
-
-  try {
-    const signedUrl = await getSignedUrl(s3Client, putObjectCommand, {
-      expiresIn: 3600, // Example expiration time (1 hour)
-    });
-
-    console.log("Signed URL:", signedUrl);
-    return signedUrl;
-  } catch (error) {
-    console.error("Error generating signed URL:", error);
-    throw error;
-  }
-};
-
-
 const queries = {
   getAllTweets: () => prismaClient.tweet.findMany({ orderBy: { createdAt: "desc" } }),
 
@@ -76,7 +48,6 @@ const queries = {
 
       const bucketName = config.env.AWS.S3.tweet_bucket;
       const bucketKey = `uploads/${ctx.user.id}/tweets/${imageName}-${Date.now()}`;
-
 
       const signedUrl = await whatsMySignURL(bucketName, bucketKey);
       return signedUrl;
