@@ -29,6 +29,7 @@ export async function initServer() {
 
             type Mutation {
               ${Tweet.mutations}
+              ${User.mutations}
             }
         `,
     resolvers: {
@@ -37,6 +38,7 @@ export async function initServer() {
         ...Tweet.resolvers.queries,
       },
       Mutation: {
+        ...User.resolvers.mutations,
         ...Tweet.resolvers.mutations,
       },
       ...Tweet.resolvers.nestedRelationResolver,
@@ -64,13 +66,10 @@ export async function initServer() {
         const token = req.headers.authorization?.split(" ")[1];
 
         if (!token || token == 'null') {
-          console.log("Token missing or null after split ============================================================");
           return {}; // Return empty context if token is not provided
         }
 
         try {
-          console.log("Token:", token, "inside try block");
-          console.log("Token Present ============================================================");
           const user = await JWTService.decodeTokenForUser(token);
           return { user }; // Attach decoded user to context
         } catch (error) {

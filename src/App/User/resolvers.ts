@@ -1,4 +1,4 @@
-import { prismaClient } from "../../client/db";
+import { prisma, prismaClient } from "../../client/db";
 import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import AuthService from "../../services/auth.service";
@@ -35,15 +35,69 @@ const queries = {
     getUserById: async (parent: any, { id }: { id: string }, ctx: GraphqlContext) => await UserService.findById(id),
 }
 
+const mutations = {
+    followUser: async (parent: any, { to }: { to: string }, ctx: GraphqlContext) => {
+        if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
+        const res = await UserService.followUser(ctx.user.id, to);
+        return !!res;
+    },
+    unfollowUser: async (parent: any, { to }: { to: string }, ctx: GraphqlContext) => {
+        if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
+        return !! await UserService.unfollowUser(ctx.user.id, to);
+    }
+}
+
+
 /**
  *  This syntax suggests that Tweet model might have a nested user object (or relation) that contains an id field. 
  *  Prisma uses this syntax when dealing with relational data and nested queries.
  *  tweets: (parent: User) => prismaClient.tweet.findMany({where: {user : {id: parent.id}}}), 
  */
+
+/*
+
+            followings: async (parent: User) => {
+                const res = await prismaClient.follows.findMany({
+                    where: { follower: { id: parent.id } },
+                    include: { following: true }
+                });
+                console.log(res);
+            },
+
+            it consoles the below result stating the fiels of followerId and followingId 
+            follower as it is a relaiton it refers to the actual User object
+            {
+                followerId: 'clxhz8hdb0000by11fz6ri3h2',
+                followingId: 'clxrtn8ul0000e5paze67bp1t',
+                following: {
+                  id: 'clxrtn8ul0000e5paze67bp1t',
+                  firstName: 'Aboli',
+                  lastName: 'Ahirrao',
+                  email: 'aboliahirrao1@gmail.com',
+                  profileImageURL: 'https://lh3.googleusercontent.com/a/ACg8ocIun8ZpOToGIhfLEp9bBWPbP0lCEcD_ZxUYEfay0OdLdytLnQ=s96-c',
+                  createdAt: 2024-06-23T17:27:23.242Z,
+                  updatedAt: 2024-06-23T17:27:23.242Z
+                }
+            }
+*/
 const nestedRelationResolver = {
     User: {
-        tweets: (parent: User) => prismaClient.tweet.findMany({where: {userId : parent.id} , orderBy: { createdAt: "desc" }}), 
+        tweets: (parent: User) => prismaClient.tweet.findMany({ where: { userId: parent.id }, orderBy: { createdAt: "desc" } }),
+        followers: async (parent: User) => {
+            const res = await prismaClient.follows.findMany({
+                where: { following: { id: parent.id } },
+                include: { follower: true },
+            });
+            return res.map(record => record.follower);
+        },
+        followings: async (parent: User) => {
+            const res = await prismaClient.follows.findMany({
+                where: { follower: { id: parent.id } },
+                include: { following: true }
+            });
+            return res.map(record => record.following);
+        },
     }
 }
 
-export const resolvers = { queries, nestedRelationResolver };
+export const resolvers = { queries, nestedRelationResolver, mutations };

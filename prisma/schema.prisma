@@ -13,32 +13,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id String @id @default(cuid())
-  firstName String
-  lastName String?
-  email String @unique
+  id              String  @id @default(cuid())
+  firstName       String
+  lastName        String?
+  email           String  @unique
   profileImageURL String?
 
-  tweets Tweet[]
+  tweets     Tweet[]
+  followers  Follows[] @relation("follower")
+  followings Follows[] @relation("following")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}  
+}
 
 // Fields sets the foreng key and ref defines its ref to field of Model mentioned before (in out case is User)
 // user doesnt create a col but defines a rel
 // in order to have this rel we should also mention it in User model
 model Tweet {
-  id String @id @default(cuid())
-  content String
+  id       String  @id @default(cuid())
+  content  String
   imageURL String? //optional
 
   userId String
-  user User @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
   // for relation (user) our userId field of model Tweet will point to id field of model User
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// this relaiton should be umique in User model meaning that
+// the follower and following should be unique and we should not be able to follow same user again 
+// hence create a composite key to make it unique
+model Follows {
+  followerId String
+  follower   User   @relation("follower", fields: [followerId], references: [id])
+
+  followingId String
+  following   User   @relation("following", fields: [followingId], references: [id])
+
+  @@id([followerId, followingId]) //to avoid dupli relation
 }
