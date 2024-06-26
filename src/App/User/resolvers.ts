@@ -30,6 +30,7 @@ const queries = {
         // Query the database to find a user with the given ID.
         const user = await UserService.findById(id);
         // Return the user object if found. If no user is found, this will return null.
+        console.log( "Get current user" ,user)
         return user;
     },
 
@@ -102,7 +103,14 @@ const nestedRelationResolver = {
         recommendedUsers: async (parent: User, anything: any, ctx: GraphqlContext) => {
             if (!ctx.user) return [];
 
-            const myFollowingArray = await prismaClient.follows.findMany({
+            const myFollowingsIdArray = await prismaClient.follows.findMany({
+                where: {
+                    follower : {id : ctx.user.id},
+                },
+
+            });
+
+            const expectedUsers = await prismaClient.follows.findMany({
                 where: {
                     follower: { id: ctx.user.id },
                 },
@@ -119,9 +127,9 @@ const nestedRelationResolver = {
                 },
             });
 
-            const arr = myFollowingArray.flatMap(entry => entry.following.followings.map(rec => rec.follower));
+            const arr = expectedUsers.flatMap(entry => entry.following.followings.map(rec => rec.follower));
             
-            return RecommendationService.getTopKRecommendedUsers(arr as User[], 2, ctx.user.id);
+            return RecommendationService.getTopKRecommendedUsers(myFollowingsIdArray , arr as User[], 2, ctx.user.id);
         }
     }
 }
