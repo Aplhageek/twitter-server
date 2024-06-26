@@ -3,6 +3,7 @@ import { GraphqlContext } from "../../interfaces";
 import { User } from "@prisma/client";
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
+import { RecommendationService } from "../../services/recommendation.service";
 
 
 
@@ -97,6 +98,31 @@ const nestedRelationResolver = {
             });
             return res.map(record => record.following);
         },
+
+        recommendedUsers: async (parent: User, anything: any, ctx: GraphqlContext) => {
+            if (!ctx.user) return [];
+
+            const myFollowingArray = await prismaClient.follows.findMany({
+                where: {
+                    follower: { id: ctx.user.id },
+                },
+                include: {
+                    following: {
+                        include: {
+                            followings : {
+                                include: {
+                                    follower : true,
+                                }
+                            }
+                        }
+                    },
+                },
+            });
+
+            const arr = myFollowingArray.flatMap(entry => entry.following.followings.map(rec => rec.follower));
+            
+            return RecommendationService.getTopKRecommendedUsers(arr as User[], 2, ctx.user.id);
+        }
     }
 }
 
