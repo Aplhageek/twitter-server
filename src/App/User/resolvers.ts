@@ -4,6 +4,7 @@ import { User } from "@prisma/client";
 import AuthService from "../../services/auth.service";
 import UserService from "../../services/user.service";
 import { RecommendationService } from "../../services/recommendation.service";
+import { redisClient } from "../../client/db/redis";
 
 
 
@@ -103,6 +104,11 @@ const nestedRelationResolver = {
         recommendedUsers: async (parent: User, anything: any, ctx: GraphqlContext) => {
             if (!ctx.user) return [];
 
+            const cachedRecList = await redisClient.get(`RECOMMENDED_USERS:${ctx.user.id}`);
+
+            if(cachedRecList) return JSON.parse(cachedRecList);
+
+
             const myFollowingsIdArray = await prismaClient.follows.findMany({
                 where: {
                     follower : {id : ctx.user.id},
@@ -129,7 +135,11 @@ const nestedRelationResolver = {
 
             const arr = expectedUsers.flatMap(entry => entry.following.followings.map(rec => rec.follower));
             
-            return RecommendationService.getTopKRecommendedUsers(myFollowingsIdArray , arr as User[], 2, ctx.user.id);
+            const recUserList = RecommendationService.getTopKRecommendedUsers(myFollowingsIdArray , arr as User[], 2, ctx.user.id);
+
+            await redisClient.set(`RECOMMENDED_USERS:${ctx.user.id}` , JSON.stringify(recUserList));
+
+            return recUserList;
         }
     }
 }
