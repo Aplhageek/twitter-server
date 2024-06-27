@@ -42,13 +42,13 @@ const mutations = {
     followUser: async (parent: any, { to }: { to: string }, ctx: GraphqlContext) => {
         if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
         const res = await UserService.followUser(ctx.user.id, to);
-        await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
+        // await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
         return !!res;
     },
     unfollowUser: async (parent: any, { to }: { to: string }, ctx: GraphqlContext) => {
         if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
         const res = await UserService.unfollowUser(ctx.user.id, to);
-        await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
+        // await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
         return !!res;
     }
 }
@@ -108,9 +108,9 @@ const nestedRelationResolver = {
         recommendedUsers: async (parent: User, anything: any, ctx: GraphqlContext) => {
             if (!ctx.user) return [];
 
-            const cachedRecList = await redisClient.get(`RECOMMENDED_USERS:${ctx.user.id}`);
+            // const cachedRecList = await redisClient.get(`RECOMMENDED_USERS:${ctx.user.id}`);
 
-            if(cachedRecList) return JSON.parse(cachedRecList);
+            // if(cachedRecList) return JSON.parse(cachedRecList);
 
 
             const myFollowingsIdArray = await prismaClient.follows.findMany({
@@ -139,11 +139,9 @@ const nestedRelationResolver = {
 
             const arr = expectedUsers.flatMap(entry => entry.following.followings.map(rec => rec.follower));
             
-            const recUserList = RecommendationService.getTopKRecommendedUsers(myFollowingsIdArray , arr as User[], 2, ctx.user.id);
+            // await redisClient.set(`RECOMMENDED_USERS:${ctx.user.id}` , JSON.stringify(recUserList));
 
-            await redisClient.set(`RECOMMENDED_USERS:${ctx.user.id}` , JSON.stringify(recUserList));
-
-            return recUserList;
+            return RecommendationService.getTopKRecommendedUsers(myFollowingsIdArray , arr as User[], 2, ctx.user.id);;
         }
     }
 }
