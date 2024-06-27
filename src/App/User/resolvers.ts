@@ -42,13 +42,17 @@ const mutations = {
     followUser: async (parent: any, { to }: { to: string }, ctx: GraphqlContext) => {
         if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
         const res = await UserService.followUser(ctx.user.id, to);
+        await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
         return !!res;
     },
     unfollowUser: async (parent: any, { to }: { to: string }, ctx: GraphqlContext) => {
         if (!ctx.user || !ctx.user.id) throw new Error("Unauthenticated");
-        return !! await UserService.unfollowUser(ctx.user.id, to);
+        const res = await UserService.unfollowUser(ctx.user.id, to);
+        await redisClient.del(`RECOMMENDED_USERS:${ctx.user.id}`);
+        return !!res;
     }
 }
+
 
 
 /**
