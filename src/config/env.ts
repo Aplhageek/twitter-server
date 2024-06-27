@@ -35,5 +35,8 @@ export const env = {
             secret_key: envVars.AWS_S3_SECRETE_KAY,
             tweet_bucket: envVars.AWS_S3_TWEET_BUCKET,
         }
+    },
+    REDIS: {
+        URL: envVars.REDIS_CONNECTIONURL,
     }
 };
