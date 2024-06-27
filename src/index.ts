@@ -1,8 +1,10 @@
 import { initServer } from "./App"
+import { config } from "./config";
 
 async function init() {
     const app = await initServer();
-    app.listen( 8000 , () => console.log(`Server started at PORT : 8000`));
+    app.listen( config.env.port , () => console.log(`Server started at PORT : ${config.env.port}`));
+    
 }
 
 
