@@ -139,11 +139,9 @@ const nestedRelationResolver = {
 
             const arr = expectedUsers.flatMap(entry => entry.following.followings.map(rec => rec.follower));
             
-            const recUserList = RecommendationService.getTopKRecommendedUsers(myFollowingsIdArray , arr as User[], 2, ctx.user.id);
-
             // await redisClient.set(`RECOMMENDED_USERS:${ctx.user.id}` , JSON.stringify(recUserList));
 
-            return recUserList;
+            return RecommendationService.getTopKRecommendedUsers(myFollowingsIdArray , arr as User[], 2, ctx.user.id);;
         }
     }
 }
