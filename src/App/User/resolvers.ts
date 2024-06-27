@@ -54,6 +54,7 @@ const mutations = {
 }
 
 
+
 /**
  *  This syntax suggests that Tweet model might have a nested user object (or relation) that contains an id field. 
  *  Prisma uses this syntax when dealing with relational data and nested queries.
